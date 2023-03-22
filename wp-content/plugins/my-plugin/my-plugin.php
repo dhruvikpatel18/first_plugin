@@ -53,10 +53,23 @@
 
  //uninstall hook is in separate file(uninstall.php)
 
-//  //shortcode for backend wordpress pages
-//  function my_sc_fun(){
-//     return 'Function call';
-//  }
-//  add_shortcode('my-sc','my_sc_fun');
+// //  //shortcode for backend wordpress pages
+//  function my_shortcode(){
+//    return 'Hello my_plugin';
+// }
+// add_shortcode('first-plugin','my_shortcode');
+
+//include script
+
+function my_custom_files(){
+   $path_js = plugins_url('js/main.js', __FILE__);//for url path for script
+   $path_style = plugins_url('css/style.css', __FILE__);//for url path for style
+   $dep = array('jquery');
+   $ver_js =filemtime(plugin_dir_path(__FILE__).'js/main.js'); //for server path
+   $ver_style =filemtime(plugin_dir_path(__FILE__).'css/style.css'); //for server path
+   wp_enqueue_script('my-custom-js',$path_js,$dep,$ver_js,true); //true is for infooter it means now wordpress knows that our script is end.
+   wp_enqueue_style('my-custom-style',$path_style,'',$ver_style);
+}
+add_action('wp_enqueue_scripts','my_custom_files');
 
 ?>
