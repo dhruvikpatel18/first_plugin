@@ -72,4 +72,77 @@ function my_custom_files(){
 }
 add_action('wp_enqueue_scripts','my_custom_files');
 
-?>
+function first_plugin(){
+   //database connection
+   global $wpdb,$table_prefix;
+   $wp_emp = $table_prefix.'emp';
+   
+   $q = "SELECT * FROM `$wp_emp`;";
+   $results = $wpdb->get_results($q);//it provides all database objects
+
+   // echo '<pre>';
+   // print_r($results);//for print array
+   // echo '<pre>';
+
+   ob_start()
+   ?>
+
+   <table>
+      <thead>
+         <tr>
+            <th>Id</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>status</th>
+         </tr>
+      </thead>
+      <tbody>
+         <?php
+         foreach($results as $row):
+         ?>
+         <tr>
+            <td><?php echo $row->id;?></td>
+            <td><?php echo $row->name;?></td>
+            <td><?php echo $row->email;?></td>
+            <td><?php echo $row->status;?></td>
+         </tr>
+         <?php
+         endforeach;
+         ?>
+      </tbody>
+   </table>
+   <?php
+   $html = ob_get_clean();
+   return $html;
+   
+
+}
+add_shortcode('first_plugin','first_plugin');
+
+//fetching post using WP_Query
+function my_posts(){
+   $args = array(
+      'post_type' => 'post',
+      // 's' => 'hello' //if we want to search a post from specific keyword
+      'category_name' => 'cat-2' //if we want to search a post from specific category
+   );
+   $query = new WP_Query($args);
+
+   ob_start();
+   if($query->have_posts()):
+   ?>
+   <ul>
+   <?php
+   while($query->have_posts()){
+      $query->the_post();
+      echo '<li>'.get_the_title().'->'.get_the_content().'</li>'; //fetch title and content of the posts
+   }
+   ?>
+   </ul>
+   <?php
+   endif;
+   wp_reset_postdata(); 
+   $html = ob_get_clean();
+   return $html;
+}
+add_shortcode('my-posts','my_posts');
