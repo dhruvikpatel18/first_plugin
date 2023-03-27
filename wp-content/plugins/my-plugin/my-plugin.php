@@ -135,7 +135,7 @@ function my_posts(){
    <?php
    while($query->have_posts()){
       $query->the_post();
-      echo '<li>'.get_the_title().'->'.get_the_content().'</li>'; //fetch title and content of the posts
+      echo '<li><a href="'.get_the_permalink().'">'.get_the_title().'</a> ->'.get_the_content().'</li>'; //fetch title and content of the posts
    }
    ?>
    </ul>
@@ -146,3 +146,25 @@ function my_posts(){
    return $html;
 }
 add_shortcode('my-posts','my_posts');
+
+function head_fun(){
+   if(is_single()){//if load the post
+     global $post;
+                            //id   ,   key   ,if available
+     $views = get_post_meta($post->ID,'views',true); //fetch the meta data
+     if($views == ''){//then initiate with 1
+         add_post_meta($post->ID,'views',1);
+     }else{//update the view by increment 1
+      $views++;
+      update_post_meta($post->ID,'views',$views);
+     }
+   //   echo get_post_meta($post->ID,'views',true);
+   }
+}
+add_action('wp_head','head_fun');//call header
+
+function views_count(){
+      global $post;
+      return 'Total views: ' .get_post_meta($post->ID,'views',true);
+}
+add_shortcode('views-count','views_count');
