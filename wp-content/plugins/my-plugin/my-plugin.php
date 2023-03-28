@@ -168,3 +168,17 @@ function views_count(){
       return 'Total views: ' .get_post_meta($post->ID,'views',true);
 }
 add_shortcode('views-count','views_count');
+
+
+function my_plugin_page_func(){
+   include 'admin/main-page.php';
+}
+function my_plugin_subpage_func(){
+   echo 'hii from sub page';
+}
+function my_plugin_menu(){
+   add_menu_page('My plugin page','My Plugin Page','manage_options','my-plugin-page','my_plugin_page_func','',6); 
+   add_submenu_page('my-plugin-page','All Emp','All Emp','manage_options','my-plugin-page','my_plugin_page_func');
+   add_submenu_page('my-plugin-page','My Plugin Sub Page','My Plugin Sub Page','manage_options','my-plugin-subpage','my_plugin_subpage_func');
+}
+add_action('admin_menu','my_plugin_menu');
