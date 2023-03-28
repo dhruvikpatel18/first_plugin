@@ -69,8 +69,10 @@ function my_custom_files(){
    $ver_style =filemtime(plugin_dir_path(__FILE__).'css/style.css'); //for server path
    wp_enqueue_script('my-custom-js',$path_js,$dep,$ver_js,true); //true is for infooter it means now wordpress knows that our script is end.
    wp_enqueue_style('my-custom-style',$path_style,'',$ver_style);
+   wp_add_inline_script('my-custom-js','var ajaxUrl = "'.admin_url('admin-ajax.php').'";','before');
 }
 add_action('wp_enqueue_scripts','my_custom_files');
+add_action('admin_enqueue_scripts','my_custom_files');
 
 function first_plugin(){
    //database connection
@@ -182,3 +184,40 @@ function my_plugin_menu(){
    add_submenu_page('my-plugin-page','My Plugin Sub Page','My Plugin Sub Page','manage_options','my-plugin-subpage','my_plugin_subpage_func');
 }
 add_action('admin_menu','my_plugin_menu');
+
+add_action('wp_ajax_my_search_func','my_search_func');
+add_action('wp_ajax_nopriv_my_search_func','my_search_func');//for logged-out users 
+function my_search_func(){
+   //database connection
+global $wpdb,$table_prefix;
+$wp_emp = $table_prefix.'emp';
+$search_term = $_POST['search_term'];
+
+if(!empty($search_term)){
+   $q = "SELECT * FROM `$wp_emp` WHERE `name` LIKE '%".$search_term."%' OR `email` LIKE '%".$search_term."%';";
+}else{
+   $q = "SELECT * FROM `$wp_emp`;";
+}
+
+$results = $wpdb->get_results($q);//it provides all database objects
+
+   ob_start();
+
+   foreach($results as $row):
+      ?>
+      <tr>
+         <td><?php echo $row->id;?></td>
+         <td><?php echo $row->name;?></td>
+         <td><?php echo $row->email;?></td>
+         <td><?php echo $row->status;?></td>
+      </tr>
+      <?php
+      endforeach;
+      echo ob_get_clean();
+      wp_die();//prevent from 0
+}
+
+add_shortcode('my-data','my_table_data');
+function my_table_data(){
+   include 'admin/main-page.php';
+}
